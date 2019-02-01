@@ -18,9 +18,9 @@ var listaChamadosFechadosMensal = []
 
 //Criando a regra de schedule.
 var rule = new schedule.RecurrenceRule();
-rule.dayOfWeek = [0, 1, 2, 3, 4];
+rule.dayOfWeek = [ 1, 2, 3, 4, 5];
 rule.hour = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-rule.minute = [0, 15, 30, 45, 59];
+rule.minute = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
 //Iniciando o Job schedule.
 var j = schedule.scheduleJob(rule, async () => {
@@ -107,10 +107,10 @@ bot.start(async ctx => {
 
 //Retorna a lista de chamados de Auto através do comando.
 bot.command("dauto", async ctx => {
-    await getChamadosMassificados()
+    await getChamadosAuto()
     const now = moment().format("DD/MM/YYYY")
     var existeChamado = false;
-    listaChamadosdeMassificados.map(chamado => {
+    listaChamadosdeAuto.map(chamado => {
         if (chamado.DataNextBreachOLA != null) {
             if (chamado.DataNextBreachOLA.substring(0, 10) == now) {
                 existeChamado = true;
@@ -121,12 +121,11 @@ bot.command("dauto", async ctx => {
         await listaChamadosdeAuto.map(chamado => {
             if (chamado.DataNextBreachOLA != null) {
                 if (chamado.DataNextBreachOLA.substring(0, 10) == now) {
-                    ctx.reply(`
-                    Incidente: ${chamado.IdIncidente}
-                    Titulo: ${chamado.Titulo}
-                    Prioridade: ${chamado.Prioridade}
-                    Vencimento: ${chamado.DataNextBreachOLA} 
-                    `)
+                    ctx.reply(`Incidente: ${chamado.IdIncidente} 
+Titulo: ${chamado.Titulo} 
+Prioridade: ${chamado.Prioridade} 
+Vencimento: ${chamado.DataNextBreachOLA}
+Status: ${chamado.Status}`)
                 }
             }
         })
@@ -152,12 +151,11 @@ bot.command("dmassificado", async ctx => {
         await listaChamadosdeMassificados.map(chamado => {
             if (chamado.DataNextBreachOLA != null) {
                 if (chamado.DataNextBreachOLA.substring(0, 10) == now) {
-                    ctx.reply(`
-                    Incidente: ${chamado.IdIncidente}
-                    Titulo: ${chamado.Titulo}
-                    Prioridade: ${chamado.Prioridade}
-                    Vencimento: ${chamado.DataNextBreachOLA} 
-                    `)
+                    ctx.reply(`Incidente: ${chamado.IdIncidente}
+Titulo: ${chamado.Titulo}
+Prioridade: ${chamado.Prioridade}
+Vencimento: ${chamado.DataNextBreachOLA}
+Status: ${chamado.Status}`)
                 }
             }
         })
@@ -171,10 +169,8 @@ bot.command("dmassificado", async ctx => {
 bot.command("fdiario", async ctx => {
     await getChamadosFechadosDiario()
     await listaChamadosFechadosDiario.map(user => {
-        ctx.reply(`
-            Usuário: ${user.NomeProfissional}
-        Fechados: ${user.ChamadosFechados}
-        `)
+        ctx.reply(`Usuário: ${user.NomeProfissional}
+Fechados: ${user.ChamadosFechados}`)
     })
 })
 
@@ -184,8 +180,7 @@ bot.command("fmensal", async ctx => {
     await listaChamadosFechadosMensal.map(user => {
         ctx.reply(
             `Usuário: ${user.NomeProfissional}
-        Fechados: ${user.ChamadosFechados}
-        `)
+Fechados: ${user.ChamadosFechados}`)
     })
 })
 
