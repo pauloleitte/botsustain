@@ -17,7 +17,7 @@ var listaChamadosWebMethods = []
 var listaChamadosMassificados = []
 var listaChamadosFechadosDiario = []
 var listaChamadosFechadosMensal = []
-
+var listaChamadosGeral = []
 
 //Criando a regra de schedule.
 var rule = new schedule.RecurrenceRule();
@@ -80,7 +80,7 @@ const enviarChamadosCargas = async () => {
         }
     })
     if (contador != 0) {
-        await telegram.sendMessage(env.groupAutoId, `Temos ${contador} para vencer na data de ${now}`)
+        //await telegram.sendMessage(env.groupAutoId, `Temos ${contador} para vencer na data de ${now}`)
     }
 
 }
@@ -98,7 +98,7 @@ const enviarChamadosWebMethods = async () => {
         }
     })
     if (contador != 0) {
-        await telegram.sendMessage(env.groupAutoId, `Temos ${contador} para vencer na data de ${now}`)
+        await telegram.sendMessage(env.groupAutoId, `Temos ${contador} na fila do WebMethods para vencer na data de ${now}`)
     }
 }
 
@@ -142,14 +142,22 @@ const getChamadosWebMethods = async () => {
     }).catch(e => console.log(e))
 }
 
+const getChamadosGeral = async () => {
+    await axios.get(`${env.apiChamados}1`).then(resp => {
+        listaChamadosGeral = resp.data
+    }).catch(e => console.log(e))
+}
+
 //Inicializa as listas.
 const main = async () => {
+    //await getChamadosGeral();
     await getChamadosAuto();
     await getChamadosMassificados();
     await getChamadosCargas();
     await getChamadosWebMethods();
     //await getChamadosFechadosMensal();
     //await getChamadosFechadosDiario();
+    console.log("Bot iniciado com sucesso")
 }
 
 //Comando de start do bot.
@@ -298,6 +306,62 @@ bot.command("fmensal", async ctx => {
         ctx.reply(
             `Usuário: ${user.NomeProfissional}
 Fechados: ${user.ChamadosFechados}`)
+    })
+})
+
+//Retorna a lista de chamados do Frota.
+bot.command("frota", async ctx => {
+    listaChamadosAuto.map(chamado => {
+        if (chamado.Titulo.includes("FR") || chamado.Titulo.includes("EFR")) {
+            var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+            ctx.reply(`Incidente: ${chamado.IdIncidente}
+Titulo: ${chamado.Titulo}
+Prioridade: ${chamado.Prioridade}
+Vencimento: ${vencimento}
+Status: ${chamado.Status}`)
+        }
+    })
+})
+
+//Retorna a lista de chamados do Novo Endosso.
+bot.command("novoendosso", async ctx => {
+    listaChamadosAuto.map(chamado => {
+        if (chamado.Titulo.includes("NEA")) {
+            var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+            ctx.reply(`Incidente: ${chamado.IdIncidente}
+Titulo: ${chamado.Titulo}
+Prioridade: ${chamado.Prioridade}
+Vencimento: ${vencimento}
+Status: ${chamado.Status}`)
+        }
+    })
+})
+
+//Retorna a lista de Chamados de Renovação.
+bot.command("renovacao", async ctx => {
+    listaChamadosAuto.map(chamado => {
+        if (chamado.Titulo.includes("RM")) {
+            var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+            ctx.reply(`Incidente: ${chamado.IdIncidente}
+Titulo: ${chamado.Titulo}
+Prioridade: ${chamado.Prioridade}
+Vencimento: ${vencimento}
+Status: ${chamado.Status}`)
+        }
+    })
+})
+
+//Retorna a lista de chamados do BB.
+bot.command("bb", async ctx => {
+    listaChamadosAuto.map(chamado => {
+        if (chamado.Titulo.includes("BB")) {
+            var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+            ctx.reply(`Incidente: ${chamado.IdIncidente}
+Titulo: ${chamado.Titulo}
+Prioridade: ${chamado.Prioridade}
+Vencimento: ${vencimento}
+Status: ${chamado.Status}`)
+        }
     })
 })
 
