@@ -80,7 +80,7 @@ const enviarChamadosCargas = async () => {
         }
     })
     if (contador != 0) {
-        //await telegram.sendMessage(env.groupAutoId, `Temos ${contador} para vencer na data de ${now}`)
+        await telegram.sendMessage(env.groupCargasId, `Temos ${contador} para vencer na data de ${now}`)
     }
 
 }
@@ -130,18 +130,21 @@ const getChamadosMassificados = async () => {
     }).catch(e => console.log(e))
 }
 
+//Realiza a chamada na API para recolher a lista de chamado de Carga.
 const getChamadosCargas = async () => {
     await axios.get(env.apiChamados + "4").then(resp => {
         listaChamadosCargas = resp.data
     }).catch(e => console.log(e))
 }
 
+//Realiza a chamada na API para recolher a lista de chamado de WebMethods.
 const getChamadosWebMethods = async () => {
     await axios.get(env.apiChamados + "5").then(resp => {
         listaChamadosWebMethods = resp.data
     }).catch(e => console.log(e))
 }
 
+//Realiza a chamada na API para recolher a lista de chamados Geral.
 const getChamadosGeral = async () => {
     await axios.get(`${env.apiChamados}1`).then(resp => {
         listaChamadosGeral = resp.data
@@ -150,6 +153,9 @@ const getChamadosGeral = async () => {
 
 //Inicializa as listas.
 const main = async () => {
+    await
+        //Start o recebimento de mensagens.
+        bot.startPolling()
     //await getChamadosGeral();
     await getChamadosAuto();
     await getChamadosMassificados();
@@ -167,7 +173,7 @@ bot.start(async ctx => {
 })
 
 //Retorna a lista de chamados de Auto através do comando.
-bot.command("dauto", async ctx => {
+bot.hears(/dauto/i, async ctx => {
     await getChamadosAuto()
     const now = moment().format("DD/MM/YYYY")
     var existeChamado = false;
@@ -198,7 +204,7 @@ Status: ${chamado.Status}`)
 })
 
 //Retorna a lista de chamados de Massificados através do comando.
-bot.command("dmassificado", async ctx => {
+bot.hears(/dmassificado/i, async ctx => {
     await getChamadosMassificados()
     const now = moment().format("DD/MM/YYYY")
     var existeChamado = false;
@@ -229,7 +235,7 @@ Status: ${chamado.Status}`)
 })
 
 //Retorna a lista de chamados de Cargas através do comando.
-bot.command("dcargas", async ctx => {
+bot.hears(/dcargas/i, async ctx => {
     await getChamadosCargas()
     const now = moment().format("DD/MM/YYYY")
     var existeChamado = false;
@@ -260,7 +266,7 @@ Status: ${chamado.Status}`)
 })
 
 //Retorna a lista de chamados de WebMethods através do comando.
-bot.command("dwebmethods", async ctx => {
+bot.hears(/dwebmethods/i, async ctx => {
     await getChamadosWebMethods()
     const now = moment().format("DD/MM/YYYY")
     var existeChamado = false;
@@ -290,27 +296,27 @@ Status: ${chamado.Status}`)
     }
 })
 
-//Retorna por usuário a lista de chamado fechados diario.
-bot.command("fdiario", async ctx => {
-    await getChamadosFechadosDiario()
-    await listaChamadosFechadosDiario.map(user => {
-        ctx.reply(`Usuário: ${user.NomeProfissional}
-Fechados: ${user.ChamadosFechados}`)
-    })
-})
+// //Retorna por usuário a lista de chamado fechados diario.
+// bot.command("fdiario", async ctx => {
+//     await getChamadosFechadosDiario()
+//     await listaChamadosFechadosDiario.map(user => {
+//         ctx.reply(`Usuário: ${user.NomeProfissional}
+// Fechados: ${user.ChamadosFechados}`)
+//     })
+// })
 
-//Retorna por usuário a lista de chamado fechados mensal.
-bot.command("fmensal", async ctx => {
-    await getChamadosFechadosMensal()
-    await listaChamadosFechadosMensal.map(user => {
-        ctx.reply(
-            `Usuário: ${user.NomeProfissional}
-Fechados: ${user.ChamadosFechados}`)
-    })
-})
+// //Retorna por usuário a lista de chamado fechados mensal.
+// bot.command("fmensal", async ctx => {
+//     await getChamadosFechadosMensal()
+//     await listaChamadosFechadosMensal.map(user => {
+//         ctx.reply(
+//             `Usuário: ${user.NomeProfissional}
+// Fechados: ${user.ChamadosFechados}`)
+//     })
+// })
 
 //Retorna a lista de chamados do Frota.
-bot.command("frota", async ctx => {
+bot.hears(/frota/i, async ctx => {
     listaChamadosAuto.map(chamado => {
         if (chamado.Titulo.includes("FR") || chamado.Titulo.includes("EFR")) {
             var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
@@ -324,7 +330,7 @@ Status: ${chamado.Status}`)
 })
 
 //Retorna a lista de chamados do Novo Endosso.
-bot.command("novoendosso", async ctx => {
+bot.hears(/novoendosso/i, async ctx => {
     listaChamadosAuto.map(chamado => {
         if (chamado.Titulo.includes("NEA")) {
             var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
@@ -338,7 +344,7 @@ Status: ${chamado.Status}`)
 })
 
 //Retorna a lista de Chamados de Renovação.
-bot.command("renovacao", async ctx => {
+bot.hears(/renovacao/i, async ctx => {
     listaChamadosAuto.map(chamado => {
         if (chamado.Titulo.includes("RM")) {
             var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
@@ -352,7 +358,7 @@ Status: ${chamado.Status}`)
 })
 
 //Retorna a lista de chamados do BB.
-bot.command("bb", async ctx => {
+bot.hears(/bb/i, async ctx => {
     listaChamadosAuto.map(chamado => {
         if (chamado.Titulo.includes("BB")) {
             var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
@@ -365,8 +371,53 @@ Status: ${chamado.Status}`)
     })
 })
 
+bot.hears(/novoportal/i, async ctx => {
+    listaChamadosAuto.map(chamado => {
+        if (chamado.Titulo.includes("NMCC")) {
+            var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+            ctx.reply(`Incidente: ${chamado.IdIncidente}
+Titulo: ${chamado.Titulo}
+Prioridade: ${chamado.Prioridade}
+Vencimento: ${vencimento}
+Status: ${chamado.Status}`)
+        }
+    })
+})
+
+bot.hears(/aauto/i, async ctx => {
+    await getChamadosAuto()
+    const now = moment().add(1, 'days').format("DD/MM/YYYY")
+    var contador = 0;
+    listaChamadosAuto.map(chamado => {
+        if (chamado.DataNextBreachOLA != null) {
+            if (moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY") == now) {
+                contador = contador + 1;
+            }
+        }
+    })
+    if (contador != 0) {
+        await ctx.reply(`Temos ${contador} para vencer na data de ${now}`)
+    }
+})
+
+
+bot.hears(/amassificado/i, async ctx => {
+    await getChamadosMassificados()
+    const now = moment().add(1, 'days').format("DD/MM/YYYY")
+    var contador = 0;
+    listaChamadosMassificados.map(chamado => {
+        if (chamado.DataNextBreachOLA != null) {
+            if (moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY") == now) {
+                contador = contador + 1;
+            }
+        }
+    })
+    if (contador != 0) {
+        await ctx.reply(`Temos ${contador} para vencer na data de ${now}`)
+    }
+})
+
+
 //Chamada do main.
 main();
 
-//Start o recebimento de mensagens.
-bot.startPolling()
