@@ -182,7 +182,7 @@ bot.start(async ctx => {
  /bb - *Lista de chamados do BB.*
  /novoportal - *Lista de chamados do novo mcc.*
  /aauto - *Número de chamados de auto a vencer na data d+1.*
- /amasssificado - *Número de chamados de massificados a vencer na data d+1.*
+ /amassificado - *Número de chamados de massificados a vencer na data d+1.*
  /chamadosantigo - *Lista de chamados com mais de 20 dias de abertura.*`)
 })
 
@@ -385,6 +385,7 @@ Status: *${chamado.Status}*`)
     })
 })
 
+//Retorna a lista de chamados do Novo MCC.
 bot.hears(/novoportal/i, async ctx => {
     listaChamadosAuto.map(chamado => {
         if (chamado.Titulo.includes("NMCC")) {
@@ -398,6 +399,7 @@ Status: *${chamado.Status}*`)
     })
 })
 
+//Retorna o número de chamaods a vencer auto d+1.
 bot.hears(/aauto/i, async ctx => {
     await getChamadosAuto()
     const now = moment().add(1, 'days').format("DD/MM/YYYY")
@@ -417,6 +419,7 @@ bot.hears(/aauto/i, async ctx => {
     }
 })
 
+//Retorna o número de chamaods a vencer massificados d+1.
 bot.hears(/amassificado/i, async ctx => {
     await getChamadosMassificados()
     const now = moment().add(1, 'days').format("DD/MM/YYYY")
@@ -436,6 +439,7 @@ bot.hears(/amassificado/i, async ctx => {
     }
 })
 
+//Retorna uma lista de chamados com mais de 20 dias de abertura.
 bot.hears(/chamadosantigo/i, async ctx => {
     const dia = moment().subtract(20, 'days').calendar()
     listaChamadosGeral.map(chamado => {
