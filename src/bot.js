@@ -174,16 +174,16 @@ bot.start(async ctx => {
     await ctx.replyWithMarkdown(`Comando disponíveis para uso:
 /dauto - *Lista de chamados de auto para vencer na data atual.*
 /dmassificado - *Lista de chamados de massificados para vencer na data atual.*
-/dcarga - *Lista de chamados de cargas para vencer na data atual.*
+/dcargas - *Lista de chamados de cargas para vencer na data atual.*
 /dwebmethods - *Lista de chamados de webMethods para vencer na data atual.*
 /frota - *Lista de chamados de frota.*
 /novoendosso - *Lista de chamados de novo endosso.*
 /renovacao - *Lista de chamados de renovação.*
- /bb - *Lista de chamados do BB.*
- /novoportal - *Lista de chamados do novo mcc.*
- /aauto - *Número de chamados de auto a vencer na data d+1.*
- /amassificado - *Número de chamados de massificados a vencer na data d+1.*
- /chamadosantigo - *Lista de chamados com mais de 20 dias de abertura.*`)
+/bb - *Lista de chamados do BB.*
+/novoportal - *Lista de chamados do novo mcc.*
+/aauto - *Número de chamados de auto a vencer na data d+1.*
+/amassificado - *Número de chamados de massificados a vencer na data d+1.*
+/chamadosantigo - *Lista de chamados com mais de 20 dias de abertura.*`)
 })
 
 //Retorna a lista de chamados de Auto através do comando.
