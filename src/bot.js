@@ -23,7 +23,7 @@ var listaChamadosGeral = []
 var rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = [1, 2, 3, 4, 5];
 rule.hour = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-rule.minute = [5, 15, 25, 35, 45, 55];
+rule.minute = [0, 10, 20, 30, 40, 50];
 
 //Iniciando o Job schedule.
 var j = schedule.scheduleJob(rule, async () => {
@@ -35,6 +35,7 @@ var j = schedule.scheduleJob(rule, async () => {
 
 //Método que realiza o envio dos chamados para o grupo de auto via telegram.
 const enviarChamadosAuto = async () => {
+    console.log('Iniciando processo de envio Auto '  + moment().format("DD/MM/YYYY HH:mm:ss"))
     await getChamadosAuto()
     const now = moment().format("DD/MM/YYYY")
     var contador = 0;
@@ -48,10 +49,12 @@ const enviarChamadosAuto = async () => {
     if (contador != 0) {
         await telegram.sendMessage(env.groupAutoId, `Temos ${contador} para vencer na data de ${now}`)
     }
+    console.log('Finalizando processo de envio Auto ' + moment().format("DD/MM/YYYY HH:mm:ss"))
 }
 
 //Método que realiza o envio dos chamados para o grupo de massificados via telegram.
 const enviarChamadosMassificados = async () => {
+    console.log('Iniciando processo de envio Massificados ' + moment().format("DD/MM/YYYY HH:mm:ss"))
     await getChamadosMassificados()
     const now = moment().format("DD/MM/YYYY")
     var contador = 0;
@@ -65,10 +68,12 @@ const enviarChamadosMassificados = async () => {
     if (contador != 0) {
         await telegram.sendMessage(env.groupMassificadoId, `Temos ${contador} para vencer na data de ${now}`)
     }
+    console.log('Finalizando processo de envio Massificado ' + moment().format("DD/MM/YYYY HH:mm:ss"))
 
 }
 //Método que realiza o envio dos chamados para o grupo de cargas via telegram.
 const enviarChamadosCargas = async () => {
+    console.log('Iniciando processo de envio Carga ' + moment().format("DD/MM/YYYY HH:mm:ss"))
     await getChamadosCargas()
     const now = moment().format("DD/MM/YYYY")
     var contador = 0;
@@ -82,11 +87,12 @@ const enviarChamadosCargas = async () => {
     if (contador != 0) {
         await telegram.sendMessage(env.groupCargasId, `Temos ${contador} para vencer na data de ${now}`)
     }
-
+    console.log('Finalizando processo de envio Carga ' + moment().format("DD/MM/YYYY HH:mm:ss"))
 }
 
 //Método que realiza o envio dos chamados para o grupo de webmethods via telegram.
 const enviarChamadosWebMethods = async () => {
+    console.log('Iniciando processo de envio WebMethods ' + moment().format("DD/MM/YYYY HH:mm:ss"))
     await getChamadosWebMethods()
     const now = moment().format("DD/MM/YYYY")
     var contador = 0;
@@ -100,6 +106,7 @@ const enviarChamadosWebMethods = async () => {
     if (contador != 0) {
         await telegram.sendMessage(env.groupAutoId, `Temos ${contador} na fila do WebMethods para vencer na data de ${now}`)
     }
+    console.log('Finalizando processo de envio WebMethods ' + moment().format("DD/MM/YYYY HH:mm:ss"))
 }
 
 //Realiza a chamada na API para recolher os dados de Chamados Fechados Diario.
