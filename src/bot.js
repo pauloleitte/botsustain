@@ -35,7 +35,7 @@ var j = schedule.scheduleJob(rule, async () => {
 
 //Método que realiza o envio dos chamados para o grupo de auto via telegram.
 const enviarChamadosAuto = async () => {
-    console.log('Iniciando processo de envio Auto '  + moment().format("DD/MM/YYYY HH:mm:ss"))
+    console.log('Iniciando processo de envio Auto ' + moment().format("DD/MM/YYYY HH:mm:ss"))
     await getChamadosAuto()
     const now = moment().format("DD/MM/YYYY")
     var contador = 0;
@@ -448,6 +448,7 @@ bot.hears(/amassificado/i, async ctx => {
 
 //Retorna uma lista de chamados com mais de 20 dias de abertura.
 bot.hears(/chamadosantigo/i, async ctx => {
+    await getChamadosGeral()
     const dia = moment().subtract(20, 'days').calendar()
     listaChamadosGeral.map(chamado => {
         if (dia >= moment(chamado.DataAbertura).format("MM/DD/YYYY")) {
@@ -464,6 +465,8 @@ Status: *${chamado.Status}*
 DataAbertura: *${dataabertura}*
 NomeGrupo: *${chamado.NomeGrupo}*
 Idade: *${idade} dias*`)
+        } else {
+            ctx.replyWithMarkdown('Não há chamados com mais de 20 dias.')
         }
     })
 })
