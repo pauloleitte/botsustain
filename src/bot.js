@@ -465,8 +465,6 @@ Status: *${chamado.Status}*
 DataAbertura: *${dataabertura}*
 NomeGrupo: *${chamado.NomeGrupo}*
 Idade: *${idade} dias*`)
-        } else {
-            ctx.replyWithMarkdown('Não há chamados com mais de 20 dias.')
         }
     })
 })
