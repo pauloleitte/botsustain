@@ -450,14 +450,34 @@ bot.hears(/amassificado/i, async ctx => {
 bot.hears(/chamadosantigo/i, async ctx => {
     await getChamadosGeral()
     const dia = moment().subtract(20, 'days').calendar()
+    var existeChamado = false
     listaChamadosGeral.map(chamado => {
         if (dia >= moment(chamado.DataAbertura).format("MM/DD/YYYY")) {
-            var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
-            var dataabertura = moment(chamado.DataAbertura).format("DD/MM/YYYY HH:mm:ss")
-            var dataAbertura = new Date(chamado.DataAbertura)
-            var idade = (new Date() - dataAbertura) / 24 / 60 / 60 / 1000
-            idade = parseFloat(idade).toFixed(0);
-            ctx.replyWithMarkdown(`Incidente: *${chamado.IdIncidente}* 
+            existeChamado = true
+//             var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+//             var dataabertura = moment(chamado.DataAbertura).format("DD/MM/YYYY HH:mm:ss")
+//             var dataAbertura = new Date(chamado.DataAbertura)
+//             var idade = (new Date() - dataAbertura) / 24 / 60 / 60 / 1000
+//             idade = parseFloat(idade).toFixed(0);
+//             ctx.replyWithMarkdown(`Incidente: *${chamado.IdIncidente}* 
+// Titulo: *${chamado.Titulo}* 
+// Prioridade: *${chamado.Prioridade}* 
+// Vencimento: *${vencimento}*
+// Status: *${chamado.Status}*
+// DataAbertura: *${dataabertura}*
+// NomeGrupo: *${chamado.NomeGrupo}*
+// Idade: *${idade} dias*`)
+        }
+    })
+    if (existeChamado) {
+        listaChamadosGeral.map(chamado => {
+            if (dia >= moment(chamado.DataAbertura).format("MM/DD/YYYY")) {
+                var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+                var dataabertura = moment(chamado.DataAbertura).format("DD/MM/YYYY HH:mm:ss")
+                var dataAbertura = new Date(chamado.DataAbertura)
+                var idade = (new Date() - dataAbertura) / 24 / 60 / 60 / 1000
+                idade = parseFloat(idade).toFixed(0);
+                ctx.replyWithMarkdown(`Incidente: *${chamado.IdIncidente}* 
 Titulo: *${chamado.Titulo}* 
 Prioridade: *${chamado.Prioridade}* 
 Vencimento: *${vencimento}*
@@ -465,8 +485,11 @@ Status: *${chamado.Status}*
 DataAbertura: *${dataabertura}*
 NomeGrupo: *${chamado.NomeGrupo}*
 Idade: *${idade} dias*`)
-        }
-    })
+            }
+        })
+    } else {
+        ctx.replyWithMarkdown("Não existe chamados com idade maior ou igual há 20 dias.")
+    }
 })
 
 //Chamada do main.
