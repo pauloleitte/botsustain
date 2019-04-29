@@ -18,6 +18,7 @@ var listaChamadosMassificados = []
 var listaChamadosFechadosDiario = []
 var listaChamadosFechadosMensal = []
 var listaChamadosGeral = []
+var listaChamadosCentralBonus = []
 
 //Criando a regra de schedule.
 var rule = new schedule.RecurrenceRule();
@@ -31,6 +32,7 @@ var j = schedule.scheduleJob(rule, async () => {
     await enviarChamadosMassificados();
     await enviarChamadosCargas();
     await enviarChamadosWebMethods();
+    await enviarChamadosCentralBonus();
 });
 
 //Método que realiza o envio dos chamados para o grupo de auto via telegram.
@@ -47,7 +49,7 @@ const enviarChamadosAuto = async () => {
         }
     })
     if (contador != 0) {
-        await telegram.sendMessage(env.groupAutoId, `Temos ${contador} para vencer na data de ${now}`)
+        await telegram.sendMessage(env.groupAutoId, `Temos ${contador} chamado(s) para vencer na data de ${now}`)
     }
     console.log('Finalizando processo de envio Auto ' + moment().format("DD/MM/YYYY HH:mm:ss"))
 }
@@ -66,7 +68,7 @@ const enviarChamadosMassificados = async () => {
         }
     })
     if (contador != 0) {
-        await telegram.sendMessage(env.groupMassificadoId, `Temos ${contador} para vencer na data de ${now}`)
+        await telegram.sendMessage(env.groupMassificadoId, `Temos ${contador} chamado(s) para vencer na data de ${now}`)
     }
     console.log('Finalizando processo de envio Massificado ' + moment().format("DD/MM/YYYY HH:mm:ss"))
 
@@ -85,7 +87,7 @@ const enviarChamadosCargas = async () => {
         }
     })
     if (contador != 0) {
-        await telegram.sendMessage(env.groupCargasId, `Temos ${contador} para vencer na data de ${now}`)
+        await telegram.sendMessage(env.groupCargasId, `Temos ${contador} chamado(s) para vencer na data de ${now}`)
     }
     console.log('Finalizando processo de envio Carga ' + moment().format("DD/MM/YYYY HH:mm:ss"))
 }
@@ -107,6 +109,24 @@ const enviarChamadosWebMethods = async () => {
         await telegram.sendMessage(env.groupAutoId, `Temos ${contador} na fila do WebMethods para vencer na data de ${now}`)
     }
     console.log('Finalizando processo de envio WebMethods ' + moment().format("DD/MM/YYYY HH:mm:ss"))
+}
+
+const enviarChamadosCentralBonus = async () =>{
+    console.log('Iniciando processo de envio Central Bonus ' + moment().format("DD/MM/YYYY HH:mm:ss"))
+    await getChamadosWebMethods()
+    const now = moment().format("DD/MM/YYYY")
+    var contador = 0;
+    listaChamadosCentralBonus.map(chamado => {
+        if (chamado.DataNextBreachOLA != null) {
+            if (moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY") == now) {
+                contador = contador + 1;
+            }
+        }
+    })
+    if (contador != 0) {
+        await telegram.sendMessage(env.groupAutoId, `Temos ${contador} chamado(s) na fila da Central de Bonus para vencer na data de ${now}`)
+    }
+    console.log('Finalizando processo de envio Central Bonus ' + moment().format("DD/MM/YYYY HH:mm:ss"))
 }
 
 //Realiza a chamada na API para recolher os dados de Chamados Fechados Diario.
@@ -158,6 +178,14 @@ const getChamadosGeral = async () => {
     }).catch(e => console.log(e))
 }
 
+
+//Realizar a chamada na API para recolher a lista de chamados de Central Bonus.
+const getChamadosCentralBonus = async () => {
+    await axios.get(`${env.apiChamados}14`).then(resp => {
+        listaChamadosCentralBonus = resp.data
+    }).catch(e => console.log(e))
+}
+
 //Inicializa as listas.
 const main = async () => {
     await
@@ -169,6 +197,7 @@ const main = async () => {
     await getChamadosCargas();
     await getChamadosWebMethods();
     await getChamadosGeral();
+    await getChamadosCentralBonus();
     //await getChamadosFechadosMensal();
     //await getChamadosFechadosDiario();
     console.log("Bot iniciado com sucesso")
@@ -190,7 +219,9 @@ bot.start(async ctx => {
 /novoportal - *Lista de chamados do novo mcc.*
 /aauto - *Número de chamados de auto a vencer na data d+1.*
 /amassificado - *Número de chamados de massificados a vencer na data d+1.*
-/chamadosantigo - *Lista de chamados com mais de 20 dias de abertura.*`)
+/chamadosantigo - *Lista de chamados com mais de 20 dias de abertura.*
+/centralbonus - *Lista de chamados na fila de Central de Bonus.*
+/webmethods - "Lista de chamados na fila de WebMethods.*`)
 })
 
 //Retorna a lista de chamados de Auto através do comando.
@@ -314,6 +345,37 @@ Status: *${chamado.Status}*`)
     }
     else {
         ctx.reply(`Não há chamados de Webmethods para ${now}.`)
+    }
+})
+
+bot.hears(/centralbonus/i, async ctx => {
+    if(listaChamadosCentralBonus.length > 0 ){
+        listaChamadosCentralBonus.map(chamado => {
+            var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+            ctx.replyWithMarkdown(`Incidente: *${chamado.IdIncidente}*
+Titulo: *${chamado.Titulo}*
+Prioridade: *${chamado.Prioridade}*
+Vencimento: *${vencimento}*
+Status: *${chamado.Status}*`)
+        })
+    }
+    else {
+        ctx.reply('Não há chamados na fila da Central de Bônus')
+    }
+})
+
+bot.hears(/webmethods/i, async ctx =>{
+    if(listaChamadosWebMethods.length > 0 ){
+        listaChamadosWebMethods.map(chamado =>{
+            var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+            ctx.replyWithMarkdown(`Incidente: *${chamado.IdIncidente}*
+Titulo: *${chamado.Titulo}*
+Prioridade: *${chamado.Prioridade}*
+Vencimento: *${vencimento}*
+Status: *${chamado.Status}*`)
+        })
+    } else{
+        ctx.reply('Não há chamados na fila de WebMethods')
     }
 })
 
@@ -454,19 +516,19 @@ bot.hears(/chamadosantigo/i, async ctx => {
     listaChamadosGeral.map(chamado => {
         if (dia >= moment(chamado.DataAbertura).format("MM/DD/YYYY")) {
             existeChamado = true
-//             var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
-//             var dataabertura = moment(chamado.DataAbertura).format("DD/MM/YYYY HH:mm:ss")
-//             var dataAbertura = new Date(chamado.DataAbertura)
-//             var idade = (new Date() - dataAbertura) / 24 / 60 / 60 / 1000
-//             idade = parseFloat(idade).toFixed(0);
-//             ctx.replyWithMarkdown(`Incidente: *${chamado.IdIncidente}* 
-// Titulo: *${chamado.Titulo}* 
-// Prioridade: *${chamado.Prioridade}* 
-// Vencimento: *${vencimento}*
-// Status: *${chamado.Status}*
-// DataAbertura: *${dataabertura}*
-// NomeGrupo: *${chamado.NomeGrupo}*
-// Idade: *${idade} dias*`)
+            //             var vencimento = moment(chamado.DataNextBreachOLA).format("DD/MM/YYYY HH:mm:ss")
+            //             var dataabertura = moment(chamado.DataAbertura).format("DD/MM/YYYY HH:mm:ss")
+            //             var dataAbertura = new Date(chamado.DataAbertura)
+            //             var idade = (new Date() - dataAbertura) / 24 / 60 / 60 / 1000
+            //             idade = parseFloat(idade).toFixed(0);
+            //             ctx.replyWithMarkdown(`Incidente: *${chamado.IdIncidente}* 
+            // Titulo: *${chamado.Titulo}* 
+            // Prioridade: *${chamado.Prioridade}* 
+            // Vencimento: *${vencimento}*
+            // Status: *${chamado.Status}*
+            // DataAbertura: *${dataabertura}*
+            // NomeGrupo: *${chamado.NomeGrupo}*
+            // Idade: *${idade} dias*`)
         }
     })
     if (existeChamado) {
